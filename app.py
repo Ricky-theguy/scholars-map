@@ -4,6 +4,7 @@ import pydeck as pdk
 import plotly.express as px
 import os
 import re
+import base64
 
 # ==========================================
 # 👇 1. User Configuration Area (Relative paths for cloud deployment)
@@ -11,6 +12,7 @@ import re
 LOCATIONS_CSV_PATH = "儒林外史_7_Cities.csv"
 TXT_FILE_PATH = "总.txt"
 CHAPTER_INFO_PATH = "chapter_data.xlsx"
+PICTURE_PATH = "BG.jpg"
 # ==========================================
 
 # 2. Basic Page Configuration
@@ -19,6 +21,40 @@ st.set_page_config(
     page_icon="🗺️",
     layout="wide"
 )
+
+# --- Function to Set Background Image ---
+def set_bg_hack(main_bg):
+    """
+    A function to unpack an image from root folder and set as bg.
+    """
+    if os.path.exists(main_bg):
+        with open(main_bg, "rb") as f:
+            data = f.read()
+            bin_str = base64.b64encode(data).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/jpg;base64,{bin_str}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            /* Add a semi-transparent background to the main content area for readability */
+            .main .block-container {{
+                background-color: rgba(255, 255, 255, 0.9);
+                padding: 2rem;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+# Apply background
+set_bg_hack(PICTURE_PATH)
 
 # --- Define Location Dictionary (Used for statistical analysis of the original text) ---
 # NOTE: 'aliases' are kept in Chinese to match the source text file.
